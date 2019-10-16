@@ -27,7 +27,7 @@ def semantic_soft_segmentation(img, features):
                                              )
 
     eig_cnt = 100
-    eigen_values, eigen_vectors = scipy.sparse.linalg.eigs(laplacian, k=eig_cnt, which='LM')
+    eigen_values, eigen_vectors = scipy.sparse.linalg.eigs(laplacian, k=eig_cnt, sigma=0, which='LM') # paper author had SM, now trying shift-invert method
     # idx = eigen_values.argsort()
     # eigen_values = eigen_values[idx][:eig_cnt]
     # eigen_vectors = eigen_vectors[:, idx][:eig_cnt]
@@ -35,8 +35,8 @@ def semantic_soft_segmentation(img, features):
     initial_segm_cnt = 40
     sparsity_param = 0.8
     iter_cnt = 40
-    init_soft_segments = soft_segments_from_eigs(eigen_vectors, laplacian, h, w, eigen_values, features,
-                                                 initial_segm_cnt, iter_cnt, sparsity_param)
+    init_soft_segments = soft_segments_from_eigs(eigen_vectors, laplacian, h, w, np.diag(eigen_values), features, # made eig vals diag like matlab
+                                             initial_segm_cnt, iter_cnt, sparsity_param)
     # grouped_segments = group_segments(init_soft_segments, features)
     # soft_segments = sparsify_segments(grouped_segments, laplacian, image_gradient(img, False, 6))
 
